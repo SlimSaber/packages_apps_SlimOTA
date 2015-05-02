@@ -94,12 +94,9 @@ public final class OTASettings {
     public static void persistUrls(OTADevice device, Context context) {
         if (device != null) {
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-            String url = sharedPreferences.getString(ROM_URL, "");
-            if (url.isEmpty()) {
-                sharedPreferences.edit().putString(ROM_URL, device.getDownloadUrl()).apply();
-                sharedPreferences.edit().putString(GAPPS_URL, device.getGappsUrl()).apply();
-                sharedPreferences.edit().putString(CHANGELOG_URL, device.getChangelogUrl()).apply();
-            }
+            sharedPreferences.edit().putString(ROM_URL, device.getDownloadUrl()).apply();
+            sharedPreferences.edit().putString(GAPPS_URL, device.getGappsUrl()).apply();
+            sharedPreferences.edit().putString(CHANGELOG_URL, device.getChangelogUrl()).apply();
         }
     }
 
