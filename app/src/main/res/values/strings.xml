@@ -1,0 +1,55 @@
+<resources>
+
+    <!-- App -->
+    <string name="app_name">SlimOTA</string>
+    <string name="app_title">SlimOTA</string>
+
+    <!-- Categories -->
+    <string name="ota_category">OTA</string>
+    <string name="links_category">Links</string>
+
+    <!-- ROM info -->
+    <string name="latest_version">Latest version: %1$s</string>
+    <string name="unknown">Unknown</string>
+    <string name="system_uptodate">Your system is up to date</string>
+
+    <!-- Check update -->
+    <string name="check_update_title">Check update</string>
+    <string name="last_check_summary">Last check: %1$s</string>
+    <string name="last_check_never">Never</string>
+
+    <!-- Update interval -->
+    <string name="interval_title">Automatic update interval</string>
+    <string name="autoupdate_enabled">Automatic update is enabled</string>
+    <string name="autoupdate_disabled">Automatic update is disabled</string>
+
+    <!-- Links -->
+    <string name="download_rom_title">Download ROM</string>
+    <string name="download_gapps_title">Download GAPPS</string>
+    <string name="download_changelog_title">Download Changelog</string>
+
+    <!-- Notification -->
+    <string name="notification_title">ROM Update</string>
+    <string name="notification_message">New update available!</string>
+
+    <!-- Dialog -->
+    <string name="dialog_message">Checking for ROM updates, please wait…</string>
+
+    <!-- OTA configurations -->
+
+    <!-- OTA XML file which contains OTA information -->
+    <string name="ota_url">https://www.dropbox.com/s/u2k60hvjn2c02h0/ota_lollipop.xml?dl=1</string>
+    <string name="release_type" translatable="false">Stable</string>
+
+    <!-- Build name: SlimSaber-bacon-5.0.2-20150426
+         Device name: bacon
+         Version delimiter: -
+         Version position: 3 (zero based)
+         Version format: yyyyMMdd -->
+    <string name="build_name" translatable="false">ro.modversion</string>
+    <string name="device_name" translatable="false">ro.product.device</string>
+    <string name="version_delimiter" translatable="false">-</string>
+    <string name="version_position" translatable="false">3</string>
+    <string name="version_format" translatable="false">yyyyMMdd</string>
+
+</resources>

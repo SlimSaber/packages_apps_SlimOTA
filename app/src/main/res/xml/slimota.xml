@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:title="@string/app_title">
+
+    <PreferenceCategory
+        android:title="@string/ota_category">
+
+        <PreferenceScreen
+            android:key="key_rom_info">
+        </PreferenceScreen>
+
+        <PreferenceScreen
+            android:key="key_check_update"
+            android:title="@string/check_update_title">
+        </PreferenceScreen>
+
+        <ListPreference
+            android:key="key_update_interval"
+            android:title="@string/interval_title"
+            android:dialogTitle="@string/interval_title"
+            android:entries="@array/interval_entries"
+            android:entryValues="@array/interval_values" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/links_category">
+
+        <PreferenceScreen
+            android:key="key_download_rom"
+            android:title="@string/download_rom_title">
+        </PreferenceScreen>
+
+        <PreferenceScreen
+            android:key="key_download_gapps"
+            android:title="@string/download_gapps_title">
+        </PreferenceScreen>
+
+        <PreferenceScreen
+            android:key="key_download_changelog"
+            android:title="@string/download_changelog_title">
+        </PreferenceScreen>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

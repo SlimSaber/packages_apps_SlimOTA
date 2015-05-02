@@ -1,0 +1,3 @@
+<WakefulIntentService
+    listener="com.fusionjack.slimota.core.OTAListener"
+    />
