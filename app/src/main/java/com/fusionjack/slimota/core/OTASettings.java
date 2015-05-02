@@ -91,13 +91,22 @@ public final class OTASettings {
         return new OTADevice(filename, romUrl, changelogUrl, gappsUrl);
     }
 
-    public static void persistDevice(OTADevice device, Context context) {
+    public static void persistUrls(OTADevice device, Context context) {
+        if (device != null) {
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+            String url = sharedPreferences.getString(ROM_URL, "");
+            if (url.isEmpty()) {
+                sharedPreferences.edit().putString(ROM_URL, device.getDownloadUrl()).apply();
+                sharedPreferences.edit().putString(GAPPS_URL, device.getGappsUrl()).apply();
+                sharedPreferences.edit().putString(CHANGELOG_URL, device.getChangelogUrl()).apply();
+            }
+        }
+    }
+
+    public static void persistLatestVersion(OTADevice device, Context context) {
         if (device != null) {
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
             sharedPreferences.edit().putString(LATEST_VERSION, device.getFilename()).apply();
-            sharedPreferences.edit().putString(ROM_URL, device.getDownloadUrl()).apply();
-            sharedPreferences.edit().putString(GAPPS_URL, device.getGappsUrl()).apply();
-            sharedPreferences.edit().putString(CHANGELOG_URL, device.getChangelogUrl()).apply();
         }
     }
 

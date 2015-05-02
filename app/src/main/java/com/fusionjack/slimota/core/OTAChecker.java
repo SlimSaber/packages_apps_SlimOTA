@@ -104,11 +104,12 @@ public class OTAChecker extends AsyncTask<Context, Void, OTADevice> {
 
         boolean updateAvailable = OTAUtils.checkVersion(device, mContext);
         if (updateAvailable) {
-            OTASettings.persistDevice(device, mContext);
+            OTASettings.persistLatestVersion(device, mContext);
             showNotification(mContext);
         }
 
         OTASettings.persistLastCheck(mContext);
+        OTASettings.persistUrls(device, mContext);
 
         if (mContext.toString().contains(MainActivity.class.getName())) {
             Message msg = mHandler.obtainMessage(MSG_CLOSE_DIALOG);
