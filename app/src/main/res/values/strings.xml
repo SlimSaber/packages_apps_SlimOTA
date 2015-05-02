@@ -38,7 +38,7 @@
     <!-- OTA configurations -->
 
     <!-- OTA XML file which contains OTA information -->
-    <string name="ota_url">https://www.dropbox.com/s/u2k60hvjn2c02h0/ota_lollipop.xml?dl=1</string>
+    <string name="ota_url" translatable="false">https://www.dropbox.com/s/u2k60hvjn2c02h0/ota_lollipop.xml?dl=1</string>
     <string name="release_type" translatable="false">Stable</string>
 
     <!-- Build name: SlimSaber-bacon-5.0.2-20150426
