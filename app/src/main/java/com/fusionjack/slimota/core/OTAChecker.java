@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
@@ -49,11 +50,24 @@ public class OTAChecker extends AsyncTask<Context, Void, OTADevice> {
 
     private static class OTAHandler extends Handler {
         private ProgressDialog mProgressDialog;
+        private AsyncTask mTask;
+
+        public OTAHandler(AsyncTask task) {
+            this.mTask = task;
+        }
 
         private void createWaitDialog(Context context) {
             mProgressDialog = new ProgressDialog(context);
-            mProgressDialog.setIndeterminate(false);
-            mProgressDialog.setMax(100);
+            mProgressDialog.setCanceledOnTouchOutside(false);
+            mProgressDialog.setCancelable(true);
+            mProgressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+                @Override
+                public void onCancel(DialogInterface dialog) {
+                    OTAUtils.logInfo("Cancelling task...");
+                    mTask.cancel(true);
+                    mInstance = null;
+                }
+            });
             mProgressDialog.setMessage(context.getString(R.string.dialog_message));
             mProgressDialog.show();
         }
@@ -75,7 +89,7 @@ public class OTAChecker extends AsyncTask<Context, Void, OTADevice> {
         }
     }
 
-    private static final Handler mHandler = new OTAHandler();
+    private final Handler mHandler = new OTAHandler(this);
     private Context mContext;
 
     @Override
