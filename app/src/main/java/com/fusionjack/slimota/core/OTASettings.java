@@ -11,9 +11,8 @@ import com.fusionjack.slimota.R;
 import com.fusionjack.slimota.parser.OTADevice;
 import com.fusionjack.slimota.utils.OTAUtils;
 
-import java.text.SimpleDateFormat;
+import java.text.DateFormat;
 import java.util.Date;
-import java.util.Locale;
 
 /**
  * Created by fusionjack on 01.05.15.
@@ -26,8 +25,6 @@ public final class OTASettings {
     private static final String ROM_URL = "rom_url";
     private static final String GAPPS_URL = "gapps_url";
     private static final String CHANGELOG_URL = "changelog_url";
-
-    private static final SimpleDateFormat DATE_FORMATER = new SimpleDateFormat("yy/MM/dd HH:mm:ss", Locale.US);
 
     private OTASettings() {
     }
@@ -65,7 +62,7 @@ public final class OTASettings {
     public static String buildLastCheckSummary(long time, Context context) {
         String prefix = context.getResources().getString(R.string.last_check_summary);
         if (time > 0) {
-            final String date = DATE_FORMATER.format(new Date(time));
+            final String date = DateFormat.getDateTimeInstance().format(new Date(time));
             return String.format(prefix, date);
         }
         return String.format(prefix, context.getResources().getString(R.string.last_check_never));
