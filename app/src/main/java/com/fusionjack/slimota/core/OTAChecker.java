@@ -117,9 +117,7 @@ public class OTAChecker extends AsyncTask<Context, Void, OTADevice> {
                     device = OTAParser.getInstance().parse(is, deviceName, releaseType);
                     is.close();
                 }
-            } catch (IOException e) {
-                OTAUtils.logError(e);
-            } catch (XmlPullParserException e) {
+            } catch (IOException | XmlPullParserException e) {
                 OTAUtils.logError(e);
             }
         }
