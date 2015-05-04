@@ -16,7 +16,9 @@ public class OTAService extends WakefulIntentService {
 
     @Override
     protected void doWakefulWork(Intent intent) {
-        OTAChecker otaChecker = new OTAChecker(true);
-        otaChecker.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, getApplicationContext());
+        OTAChecker otaChecker = OTAChecker.getInstance(true);
+        if (!otaChecker.getStatus().equals(AsyncTask.Status.RUNNING)) {
+            otaChecker.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, getApplicationContext());
+        }
     }
 }
