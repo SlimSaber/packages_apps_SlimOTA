@@ -130,7 +130,7 @@ public class SlimOTAFragment extends PreferenceFragment implements
         final String key = preference.getKey();
         switch (key) {
             case KEY_CHECK_UPDATE:
-                OTAChecker otaChecker = new OTAChecker();
+                OTAChecker otaChecker = new OTAChecker(false);
                 otaChecker.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, getActivity());
                 return true;
             case KEY_DOWNLOAD_ROM:

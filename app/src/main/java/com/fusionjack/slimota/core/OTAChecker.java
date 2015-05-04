@@ -32,6 +32,12 @@ public class OTAChecker extends AsyncTask<Context, Void, OTADevice> {
     private static final int MSG_SHOW_DIALOG = 0;
     private static final int MSG_CLOSE_DIALOG = 1;
 
+    private boolean mIsBackgroundThread;
+
+    public OTAChecker(boolean isBackgroundThread) {
+        this.mIsBackgroundThread = isBackgroundThread;
+    }
+
     private static class OTAHandler extends Handler {
         private ProgressDialog mProgressDialog;
 
@@ -71,7 +77,7 @@ public class OTAChecker extends AsyncTask<Context, Void, OTADevice> {
             return null;
         }
 
-        if (mContext.toString().contains(MainActivity.class.getName())) {
+        if (!mIsBackgroundThread) {
             Message msg = mHandler.obtainMessage(MSG_SHOW_DIALOG);
             msg.obj = mContext;
             mHandler.sendMessage(msg);
@@ -111,7 +117,7 @@ public class OTAChecker extends AsyncTask<Context, Void, OTADevice> {
         OTASettings.persistLastCheck(mContext);
         OTASettings.persistUrls(device, mContext);
 
-        if (mContext.toString().contains(MainActivity.class.getName())) {
+        if (!mIsBackgroundThread) {
             Message msg = mHandler.obtainMessage(MSG_CLOSE_DIALOG);
             mHandler.sendMessage(msg);
         }
