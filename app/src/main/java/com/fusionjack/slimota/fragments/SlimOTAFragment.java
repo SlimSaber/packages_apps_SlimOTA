@@ -9,7 +9,7 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 
 import com.fusionjack.slimota.R;
-import com.fusionjack.slimota.core.OTAChecker;
+import com.fusionjack.slimota.core.OTACheckerTask;
 import com.fusionjack.slimota.core.OTASettings;
 import com.fusionjack.slimota.dialog.OTADialogFragment;
 import com.fusionjack.slimota.parser.OTADevice;
@@ -40,7 +40,7 @@ public class SlimOTAFragment extends PreferenceFragment implements
     private PreferenceScreen mChangelogUrl;
 
     private OTADevice mDevice;
-    private OTAChecker mOTAChecker;
+    private OTACheckerTask mTask;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -131,9 +131,9 @@ public class SlimOTAFragment extends PreferenceFragment implements
 
     @Override
     public void onProgressCancelled() {
-        if (mOTAChecker != null) {
-            mOTAChecker.cancel(true);
-            mOTAChecker = null;
+        if (mTask != null) {
+            mTask.cancel(true);
+            mTask = null;
         }
     }
 
@@ -142,9 +142,9 @@ public class SlimOTAFragment extends PreferenceFragment implements
         final String key = preference.getKey();
         switch (key) {
             case KEY_CHECK_UPDATE:
-                mOTAChecker = OTAChecker.getInstance(false);
-                if (!mOTAChecker.getStatus().equals(AsyncTask.Status.RUNNING)) {
-                    mOTAChecker.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, getActivity());
+                mTask = OTACheckerTask.getInstance(false);
+                if (!mTask.getStatus().equals(AsyncTask.Status.RUNNING)) {
+                    mTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, getActivity());
                 }
                 return true;
             case KEY_DOWNLOAD_ROM:

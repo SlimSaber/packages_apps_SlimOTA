@@ -27,20 +27,20 @@ import java.io.InputStream;
 /**
  * Created by fusionjack on 29.04.15.
  */
-public class OTAChecker extends AsyncTask<Context, Void, OTADevice> {
+public class OTACheckerTask extends AsyncTask<Context, Void, OTADevice> {
 
-    private static OTAChecker mAsyncTaskInstance = null;
+    private static OTACheckerTask mAsyncTaskInstance = null;
     private final Handler mHandler = new OTADialogHandler();
     private Context mContext;
     private boolean mIsBackgroundThread;
 
-    private OTAChecker(boolean isBackgroundThread) {
+    private OTACheckerTask(boolean isBackgroundThread) {
         this.mIsBackgroundThread = isBackgroundThread;
     }
 
-    public static OTAChecker getInstance(boolean isBackgroundThread) {
+    public static OTACheckerTask getInstance(boolean isBackgroundThread) {
         if (mAsyncTaskInstance == null) {
-            mAsyncTaskInstance = new OTAChecker(isBackgroundThread);
+            mAsyncTaskInstance = new OTACheckerTask(isBackgroundThread);
         }
         return mAsyncTaskInstance;
     }
