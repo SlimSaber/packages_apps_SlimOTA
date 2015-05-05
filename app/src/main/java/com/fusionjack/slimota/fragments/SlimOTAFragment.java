@@ -11,6 +11,7 @@ import android.preference.PreferenceScreen;
 import com.fusionjack.slimota.R;
 import com.fusionjack.slimota.core.OTAChecker;
 import com.fusionjack.slimota.core.OTASettings;
+import com.fusionjack.slimota.dialog.OTADialogFragment;
 import com.fusionjack.slimota.parser.OTADevice;
 import com.fusionjack.slimota.utils.OTAUtils;
 
@@ -19,7 +20,8 @@ import com.fusionjack.slimota.utils.OTAUtils;
  */
 public class SlimOTAFragment extends PreferenceFragment implements
         Preference.OnPreferenceChangeListener,
-        SharedPreferences.OnSharedPreferenceChangeListener {
+        SharedPreferences.OnSharedPreferenceChangeListener ,
+        OTADialogFragment.OTADialogListener {
 
     private static final String KEY_ROM_INFO = "key_rom_info";
     private static final String KEY_CHECK_UPDATE = "key_check_update";
@@ -38,10 +40,12 @@ public class SlimOTAFragment extends PreferenceFragment implements
     private PreferenceScreen mChangelogUrl;
 
     private OTADevice mDevice;
+    private OTAChecker mOTAChecker;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRetainInstance(true);
 
         addPreferencesFromResource(R.xml.slimota);
 
@@ -126,13 +130,21 @@ public class SlimOTAFragment extends PreferenceFragment implements
     }
 
     @Override
+    public void onProgressCancelled() {
+        if (mOTAChecker != null) {
+            mOTAChecker.cancel(true);
+            mOTAChecker = null;
+        }
+    }
+
+    @Override
     public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
         final String key = preference.getKey();
         switch (key) {
             case KEY_CHECK_UPDATE:
-                OTAChecker otaChecker = OTAChecker.getInstance(false);
-                if (!otaChecker.getStatus().equals(AsyncTask.Status.RUNNING)) {
-                    otaChecker.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, getActivity());
+                mOTAChecker = OTAChecker.getInstance(false);
+                if (!mOTAChecker.getStatus().equals(AsyncTask.Status.RUNNING)) {
+                    mOTAChecker.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, getActivity());
                 }
                 return true;
             case KEY_DOWNLOAD_ROM:
