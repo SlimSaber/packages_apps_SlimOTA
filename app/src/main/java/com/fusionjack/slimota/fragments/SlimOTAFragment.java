@@ -97,14 +97,14 @@ public class SlimOTAFragment extends PreferenceFragment implements
             final String currentVersion = OTAUtils.getCurrentVersion(getActivity());
             mRomInfo.setTitle(currentVersion);
 
-            if (OTASettings.isSystemUpToDate(getActivity())) {
+            String prefix = getActivity().getResources().getString(R.string.latest_version);
+            String latestVersion = OTASettings.getLatestVersion(getActivity());
+            if (latestVersion.isEmpty()) {
+                latestVersion = getActivity().getResources().getString(R.string.unknown);
+                mRomInfo.setSummary(String.format(prefix, latestVersion));
+            } else if (!OTAUtils.checkVersion(currentVersion, latestVersion, getActivity())) {
                 mRomInfo.setSummary(getActivity().getResources().getString(R.string.system_uptodate));
             } else {
-                String latestVersion = OTASettings.getLatestVersion(getActivity());
-                if (latestVersion.isEmpty()) {
-                    latestVersion = getActivity().getResources().getString(R.string.unknown);
-                }
-                String prefix = getActivity().getResources().getString(R.string.latest_version);
                 mRomInfo.setSummary(String.format(prefix, latestVersion));
             }
         }

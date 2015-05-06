@@ -80,11 +80,11 @@ public class OTACheckerTask extends AsyncTask<Context, Void, OTADevice> {
 
         boolean updateAvailable = OTAUtils.checkVersion(device, mContext);
         if (updateAvailable) {
-            OTASettings.persistLatestVersion(device, mContext);
             showNotification(mContext);
         }
 
         OTASettings.persistLastCheck(mContext);
+        OTASettings.persistLatestVersion(device, mContext);
         OTASettings.persistUrls(device, mContext);
 
         hideProgressDialog();
