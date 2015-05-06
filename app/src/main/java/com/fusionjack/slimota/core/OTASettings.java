@@ -10,7 +10,6 @@ import com.commonsware.cwac.wakeful.WakefulIntentService;
 import com.fusionjack.slimota.R;
 import com.fusionjack.slimota.parser.OTADevice;
 import com.fusionjack.slimota.parser.OTAParser;
-import com.fusionjack.slimota.utils.OTAUtils;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -39,12 +38,6 @@ public final class OTASettings {
 
     public static String getUpdateIntervalKey() {
         return UPDATE_INTERVAL;
-    }
-
-    public static boolean isSystemUpToDate(Context context) {
-        final String currentVersion = OTAUtils.getCurrentVersion(context);
-        final String latestVersion = getLatestVersion(context);
-        return !OTAUtils.checkVersion(currentVersion, latestVersion, context);
     }
 
     public static String buildLastCheckSummary(long time, Context context) {
