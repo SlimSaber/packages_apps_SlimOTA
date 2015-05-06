@@ -72,7 +72,7 @@ public final class OTAUtils {
             return false;
         }
 
-        String serverBuildname = device.getFilename();
+        String serverBuildname = device.getLatestVersion();
         String localBuildname = getCurrentVersion(context);
         OTAUtils.logInfo("serverBuildname: " + serverBuildname);
         OTAUtils.logInfo("localBuildname: " + localBuildname);

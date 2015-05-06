@@ -25,23 +25,8 @@
     </PreferenceCategory>
 
     <PreferenceCategory
+        android:key="category_links"
         android:title="@string/links_category">
-
-        <PreferenceScreen
-            android:key="key_download_rom"
-            android:title="@string/download_rom_title">
-        </PreferenceScreen>
-
-        <PreferenceScreen
-            android:key="key_download_gapps"
-            android:title="@string/download_gapps_title">
-        </PreferenceScreen>
-
-        <PreferenceScreen
-            android:key="key_download_changelog"
-            android:title="@string/download_changelog_title">
-        </PreferenceScreen>
-
     </PreferenceCategory>
 
 </PreferenceScreen>

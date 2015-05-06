@@ -14,10 +14,8 @@ import java.io.InputStream;
 public class OTAParser {
 
     private static final String ns = null;
-    private static final String TAG_FILENAME = "Filename";
-    private static final String TAG_DOWNLOAD_URL = "DownloadUrl";
-    private static final String TAG_CHANGELOG_URL = "ChangelogUrl";
-    private static final String TAG_GAPPS_URL = "GappsUrl";
+    private static final String FILENAME_TAG = "Filename";
+    private static final String URL_TAG = "Url";
 
     private String mDeviceName = null;
     private String mReleaseType = null;
@@ -51,6 +49,18 @@ public class OTAParser {
         }
     }
 
+    public static boolean isUrlKey(String key) {
+        return key.toLowerCase().endsWith(URL_TAG.toLowerCase());
+    }
+
+    public static String stripUrlfromKey(String key) {
+        int index = key.toLowerCase().indexOf(URL_TAG.toLowerCase());
+        if (index > 0) {
+            return key.substring(0, index);
+        }
+        return key;
+    }
+
     private void readBuildType(XmlPullParser parser) throws XmlPullParserException, IOException {
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
@@ -81,28 +91,21 @@ public class OTAParser {
 
     private void readDevice(XmlPullParser parser) throws XmlPullParserException, IOException {
         parser.require(XmlPullParser.START_TAG, ns, mDeviceName);
-        String filename = null;
-        String downloadUrl = null;
-        String changelogUrl = null;
-        String gappsUrl = null;
+        mDevice = new OTADevice();
         while (parser.next() != XmlPullParser.END_TAG) {
             if (parser.getEventType() != XmlPullParser.START_TAG) {
                 continue;
             }
-            String name = parser.getName();
-            if (name.equalsIgnoreCase(TAG_FILENAME)) {
-                filename = readTag(parser, TAG_FILENAME);
-            } else if (name.equalsIgnoreCase(TAG_DOWNLOAD_URL)) {
-                downloadUrl = readTag(parser, TAG_DOWNLOAD_URL);
-            } else if (name.equalsIgnoreCase(TAG_CHANGELOG_URL)) {
-                changelogUrl = readTag(parser, TAG_CHANGELOG_URL);
-            } else if (name.equalsIgnoreCase(TAG_GAPPS_URL)) {
-                gappsUrl = readTag(parser, TAG_GAPPS_URL);
+            String tagName = parser.getName();
+            String tagValue = readTag(parser, tagName);
+            if (tagName.equalsIgnoreCase(FILENAME_TAG)) {
+                mDevice.setLatestVersion(tagValue);
+            } else if (isUrlKey(tagName)) {
+                mDevice.addUrl(tagName, tagValue);
             } else {
                 skip(parser);
             }
         }
-        mDevice = new OTADevice(filename, downloadUrl, changelogUrl, gappsUrl);
     }
 
     private String readTag(XmlPullParser parser, String tag) throws IOException, XmlPullParserException {

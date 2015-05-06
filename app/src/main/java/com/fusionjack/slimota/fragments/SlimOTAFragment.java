@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
+import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 
@@ -13,6 +14,7 @@ import com.fusionjack.slimota.core.OTACheckerTask;
 import com.fusionjack.slimota.core.OTASettings;
 import com.fusionjack.slimota.dialog.OTADialogFragment;
 import com.fusionjack.slimota.parser.OTADevice;
+import com.fusionjack.slimota.parser.OTAParser;
 import com.fusionjack.slimota.utils.OTAUtils;
 
 /**
@@ -26,20 +28,13 @@ public class SlimOTAFragment extends PreferenceFragment implements
     private static final String KEY_ROM_INFO = "key_rom_info";
     private static final String KEY_CHECK_UPDATE = "key_check_update";
     private static final String KEY_UPDATE_INTERVAL = "key_update_interval";
-
-    private static final String KEY_DOWNLOAD_ROM = "key_download_rom";
-    private static final String KEY_DOWNLOAD_GAPPS = "key_download_gapps";
-    private static final String KEY_DOWNLOAD_CHANGELOG = "key_download_changelog";
+    private static final String CATEGORY_LINKS = "category_links";
 
     private PreferenceScreen mRomInfo;
     private PreferenceScreen mCheckUpdate;
     private ListPreference mUpdateInterval;
+    private PreferenceCategory mLinksCategory;
 
-    private PreferenceScreen mRomUrl;
-    private PreferenceScreen mGappsUrl;
-    private PreferenceScreen mChangelogUrl;
-
-    private OTADevice mDevice;
     private OTACheckerTask mTask;
 
     @Override
@@ -57,9 +52,20 @@ public class SlimOTAFragment extends PreferenceFragment implements
             mUpdateInterval.setOnPreferenceChangeListener(this);
         }
 
-        mRomUrl = (PreferenceScreen) getPreferenceScreen().findPreference(KEY_DOWNLOAD_ROM);
-        mGappsUrl = (PreferenceScreen) getPreferenceScreen().findPreference(KEY_DOWNLOAD_GAPPS);
-        mChangelogUrl = (PreferenceScreen) getPreferenceScreen().findPreference(KEY_DOWNLOAD_CHANGELOG);
+        mLinksCategory = (PreferenceCategory) getPreferenceScreen().findPreference(CATEGORY_LINKS);
+        if (mLinksCategory != null) {
+            OTADevice device = OTASettings.getUrls(getActivity());
+            for (String key : device.getUrls()) {
+                PreferenceScreen urlPref = (PreferenceScreen) getPreferenceScreen().findPreference(key);
+                if (urlPref == null) {
+                    urlPref = getPreferenceManager().createPreferenceScreen(getActivity());
+                    urlPref.setKey(key);
+                    mLinksCategory.addPreference(urlPref);
+                }
+            }
+        }
+
+        updatePreferences();
     }
 
     private void updatePreferences() {
@@ -70,18 +76,19 @@ public class SlimOTAFragment extends PreferenceFragment implements
     }
 
     private void updateUrls() {
-        mDevice = OTASettings.getDevice(getActivity());
-        if (mRomUrl != null) {
-            String url = mDevice.getDownloadUrl();
-            mRomUrl.setSummary(url.isEmpty() ? "" : url);
-        }
-        if (mGappsUrl != null) {
-            String url = mDevice.getGappsUrl();
-            mGappsUrl.setSummary(url.isEmpty() ? "" : url);
-        }
-        if (mChangelogUrl != null) {
-            String url = mDevice.getChangelogUrl();
-            mChangelogUrl.setSummary(url.isEmpty() ? "" : url);
+        OTADevice device = OTASettings.getUrls(getActivity());
+        for (String key : device.getUrls()) {
+            PreferenceScreen urlPref = (PreferenceScreen) getPreferenceScreen().findPreference(key);
+            if (urlPref == null && mLinksCategory != null) {
+                urlPref = getPreferenceManager().createPreferenceScreen(getActivity());
+                urlPref.setKey(key);
+                mLinksCategory.addPreference(urlPref);
+            }
+            if (urlPref != null) {
+                urlPref.setTitle(OTAParser.stripUrlfromKey(key));
+                String url = device.getUrl(key);
+                urlPref.setSummary(url.isEmpty() ? "" : url);
+            }
         }
     }
 
@@ -147,19 +154,9 @@ public class SlimOTAFragment extends PreferenceFragment implements
                     mTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, getActivity());
                 }
                 return true;
-            case KEY_DOWNLOAD_ROM:
-                if (mDevice != null) {
-                    OTAUtils.launchUrl(mDevice.getDownloadUrl(), getActivity());
-                }
-                break;
-            case KEY_DOWNLOAD_GAPPS:
-                if (mDevice != null) {
-                    OTAUtils.launchUrl(mDevice.getGappsUrl(), getActivity());
-                }
-                break;
-            case KEY_DOWNLOAD_CHANGELOG:
-                if (mDevice != null) {
-                    OTAUtils.launchUrl(mDevice.getChangelogUrl(), getActivity());
+            default:
+                if (OTAParser.isUrlKey(key)) {
+                    OTAUtils.launchUrl(OTASettings.getUrl(key, getActivity()), getActivity());
                 }
                 break;
         }
@@ -186,8 +183,7 @@ public class SlimOTAFragment extends PreferenceFragment implements
         if (key.equals(OTASettings.getUpdateIntervalKey())) {
             updateIntervalSummary();
         }
-        if (key.equals(OTASettings.getRomUrl()) || key.equals(OTASettings.getGappsUrl()) ||
-                key.equals(OTASettings.getChangelogUrl())) {
+        if (OTAParser.isUrlKey(key)) {
             updateUrls();
         }
     }

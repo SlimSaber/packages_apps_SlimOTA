@@ -23,11 +23,6 @@
     <string name="autoupdate_enabled">Automatic update is enabled</string>
     <string name="autoupdate_disabled">Automatic update is disabled</string>
 
-    <!-- Links -->
-    <string name="download_rom_title">Download ROM</string>
-    <string name="download_gapps_title">Download GAPPS</string>
-    <string name="download_changelog_title">Download Changelog</string>
-
     <!-- Notification -->
     <string name="notification_title">ROM Update</string>
     <string name="notification_message">New update available!</string>

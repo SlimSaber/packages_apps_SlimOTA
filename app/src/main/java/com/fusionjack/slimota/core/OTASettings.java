@@ -9,10 +9,13 @@ import android.widget.Toast;
 import com.commonsware.cwac.wakeful.WakefulIntentService;
 import com.fusionjack.slimota.R;
 import com.fusionjack.slimota.parser.OTADevice;
+import com.fusionjack.slimota.parser.OTAParser;
 import com.fusionjack.slimota.utils.OTAUtils;
 
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by fusionjack on 01.05.15.
@@ -22,9 +25,6 @@ public final class OTASettings {
     private static final String LAST_CHECK = "last_check";
     private static final String UPDATE_INTERVAL = "update_interval";
     private static final String LATEST_VERSION = "latest_version";
-    private static final String ROM_URL = "rom_url";
-    private static final String GAPPS_URL = "gapps_url";
-    private static final String CHANGELOG_URL = "changelog_url";
 
     private OTASettings() {
     }
@@ -39,18 +39,6 @@ public final class OTASettings {
 
     public static String getUpdateIntervalKey() {
         return UPDATE_INTERVAL;
-    }
-
-    public static String getRomUrl() {
-        return ROM_URL;
-    }
-
-    public static String getGappsUrl() {
-        return GAPPS_URL;
-    }
-
-    public static String getChangelogUrl() {
-        return CHANGELOG_URL;
     }
 
     public static boolean isSystemUpToDate(Context context) {
@@ -79,28 +67,38 @@ public final class OTASettings {
         return sharedPreferences.getString(LATEST_VERSION, "");
     }
 
-    public static OTADevice getDevice(Context context) {
+    public static String getUrl(String key, Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        String filename = sharedPreferences.getString(LATEST_VERSION, "");
-        String romUrl = sharedPreferences.getString(ROM_URL, "");
-        String gappsUrl = sharedPreferences.getString(GAPPS_URL, "");
-        String changelogUrl = sharedPreferences.getString(CHANGELOG_URL, "");
-        return new OTADevice(filename, romUrl, changelogUrl, gappsUrl);
+        return sharedPreferences.getString(key, "");
+    }
+
+    public static OTADevice getUrls(Context context) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        Map<String, ?> prefs = sharedPreferences.getAll();
+        OTADevice device = new OTADevice();
+        for (String key : prefs.keySet()) {
+            if (OTAParser.isUrlKey(key)) {
+                final String url = sharedPreferences.getString(key, "");
+                device.addUrl(key, url);
+            }
+        }
+        return device;
     }
 
     public static void persistUrls(OTADevice device, Context context) {
         if (device != null) {
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-            sharedPreferences.edit().putString(ROM_URL, device.getDownloadUrl()).apply();
-            sharedPreferences.edit().putString(GAPPS_URL, device.getGappsUrl()).apply();
-            sharedPreferences.edit().putString(CHANGELOG_URL, device.getChangelogUrl()).apply();
+            Set<String> keys = device.getUrls();
+            for (String key : keys) {
+                sharedPreferences.edit().putString(key, device.getUrl(key)).apply();
+            }
         }
     }
 
     public static void persistLatestVersion(OTADevice device, Context context) {
         if (device != null) {
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-            sharedPreferences.edit().putString(LATEST_VERSION, device.getFilename()).apply();
+            sharedPreferences.edit().putString(LATEST_VERSION, device.getLatestVersion()).apply();
         }
     }
 

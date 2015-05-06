@@ -1,35 +1,38 @@
 package com.fusionjack.slimota.parser;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 /**
  * Created by fusionjack on 30.04.15.
  */
 public class OTADevice {
 
-    private String filename = null;
-    private String downloadUrl = null;
-    private String changelogUrl = null;
-    private String gappsUrl = null;
+    private Map<String, String> mUrlMap;
+    private String mLatestVersion;
 
-    public OTADevice(String filename, String downloadUrl, String changelogUrl, String gappsUrl) {
-        this.filename = filename;
-        this.downloadUrl = downloadUrl;
-        this.changelogUrl = changelogUrl;
-        this.gappsUrl = gappsUrl;
+    public OTADevice() {
+        mUrlMap = new HashMap<>();
     }
 
-    public String getFilename() {
-        return filename;
+    public void addUrl(String key, String value) {
+        mUrlMap.put(key, value);
     }
 
-    public String getDownloadUrl() {
-        return downloadUrl;
+    public String getUrl(String key) {
+        return mUrlMap.get(key);
     }
 
-    public String getChangelogUrl() {
-        return changelogUrl;
+    public Set<String> getUrls() {
+        return mUrlMap.keySet();
     }
 
-    public String getGappsUrl() {
-        return gappsUrl;
+    public void setLatestVersion(String latestVersion) {
+        this.mLatestVersion = latestVersion;
+    }
+
+    public String getLatestVersion() {
+        return mLatestVersion;
     }
 }
