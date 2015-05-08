@@ -60,7 +60,8 @@ public class OTACheckerTask extends AsyncTask<Context, Void, OTADevice> {
         OTAUtils.logInfo("deviceName: " + deviceName);
         if (!deviceName.isEmpty()) {
             try {
-                InputStream is = OTAUtils.downloadURL(mContext.getString(R.string.ota_url));
+                String otaUrl = OTAConfig.getInstance(mContext).getProperty(OTAConfig.OTA_URL);
+                InputStream is = OTAUtils.downloadURL(otaUrl);
                 if (is != null) {
                     final String releaseType = OTAUtils.getReleaseType(mContext);
                     device = OTAParser.getInstance().parse(is, deviceName, releaseType);

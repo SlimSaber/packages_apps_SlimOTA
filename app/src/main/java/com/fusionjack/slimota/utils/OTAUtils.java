@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 
-import com.fusionjack.slimota.R;
+import com.fusionjack.slimota.core.OTAConfig;
 import com.fusionjack.slimota.parser.OTADevice;
 
 import java.io.BufferedReader;
@@ -46,14 +46,14 @@ public final class OTAUtils {
 
     public static String getReleaseType(Context context) {
         if (context != null) {
-            return context.getResources().getString(R.string.release_type);
+            return OTAConfig.getInstance(context).getProperty(OTAConfig.RELEASE_TYPE);
         }
         return "";
     }
 
     public static String getCurrentVersion(Context context) {
         if (context != null && mCurrentVersion.isEmpty()) {
-            final String propName = context.getResources().getString(R.string.build_name);
+            String propName = OTAConfig.getInstance(context).getProperty(OTAConfig.VERSION_NAME);
             mCurrentVersion = getProperty(propName);
         }
         return mCurrentVersion;
@@ -61,7 +61,7 @@ public final class OTAUtils {
 
     public static String getDeviceName(Context context) {
         if (context != null && mDeviceName.isEmpty()) {
-            final String propName = context.getResources().getString(R.string.device_name);
+            String propName = OTAConfig.getInstance(context).getProperty(OTAConfig.DEVICE_NAME);
             mDeviceName = getProperty(propName);
         }
         return mDeviceName;

@@ -2,7 +2,7 @@ package com.fusionjack.slimota.utils;
 
 import android.content.Context;
 
-import com.fusionjack.slimota.R;
+import com.fusionjack.slimota.core.OTAConfig;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -13,14 +13,16 @@ import java.util.Locale;
 public final class OTAVersion {
 
     private Context mContext = null;
+    private OTAConfig mConfig = null;
 
     public OTAVersion(Context context) {
         this.mContext = context;
+        mConfig = OTAConfig.getInstance(mContext);
     }
 
     public String getDelimiter() {
         if (mContext != null) {
-            return mContext.getResources().getString(R.string.version_delimiter);
+            return mConfig.getProperty(OTAConfig.VERSION_DELIMITER);
         }
         return "";
     }
@@ -29,7 +31,7 @@ public final class OTAVersion {
         int position = -1;
         if (mContext != null) {
             try {
-                position = Integer.parseInt(mContext.getResources().getString(R.string.version_position));
+                position = Integer.parseInt(mConfig.getProperty(OTAConfig.VERSION_POSITION));
             } catch (NumberFormatException e) {
                 position = -1;
             }
@@ -39,7 +41,7 @@ public final class OTAVersion {
 
     public SimpleDateFormat getFormat() {
         if (mContext != null) {
-            String format = mContext.getResources().getString(R.string.version_format);
+            String format = mConfig.getProperty(OTAConfig.VERSION_FORMAT);
             return new SimpleDateFormat(format, Locale.US);
         }
         return null;
