@@ -1,4 +1,4 @@
-package com.fusionjack.slimota.dialog;
+package com.fusionjack.slimota.dialogs;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -10,12 +10,12 @@ import android.os.Message;
 /**
  * Created by fusionjack on 05.05.15.
  */
-public class OTADialogHandler extends Handler {
+public class WaitDialogHandler extends Handler {
 
     public static final int MSG_SHOW_DIALOG = 0;
     public static final int MSG_CLOSE_DIALOG = 1;
 
-    private static final String DIALOG_TAG = OTADialogFragment.class.getName();
+    private static final String DIALOG_TAG = WaitDialogFragment.class.getName();
 
     private Context mContext;
 
@@ -34,12 +34,12 @@ public class OTADialogHandler extends Handler {
                     }
                     ft.addToBackStack(null);
 
-                    OTADialogFragment dialog = OTADialogFragment.newInstance();
+                    WaitDialogFragment dialog = WaitDialogFragment.newInstance();
                     dialog.show(ft, DIALOG_TAG);
                 }
                 break;
             case MSG_CLOSE_DIALOG:
-                OTADialogFragment dialog = getOTADialogFragment();
+                WaitDialogFragment dialog = getOTADialogFragment();
                 if (dialog != null) {
                     dialog.dismissAllowingStateLoss();
                 }
@@ -49,11 +49,11 @@ public class OTADialogHandler extends Handler {
         }
     }
 
-    private OTADialogFragment getOTADialogFragment() {
+    private WaitDialogFragment getOTADialogFragment() {
         if (mContext instanceof Activity) {
             Activity activity = (Activity) mContext;
             Fragment fragment = activity.getFragmentManager().findFragmentByTag(DIALOG_TAG);
-            return (OTADialogFragment) fragment;
+            return (WaitDialogFragment) fragment;
         }
         return null;
     }

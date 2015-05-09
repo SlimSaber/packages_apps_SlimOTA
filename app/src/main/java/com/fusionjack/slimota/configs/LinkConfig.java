@@ -1,9 +1,9 @@
-package com.fusionjack.slimota.core;
+package com.fusionjack.slimota.configs;
 
 import android.content.Context;
 
-import com.fusionjack.slimota.parser.OTALink;
-import com.fusionjack.slimota.parser.OTAParser;
+import com.fusionjack.slimota.xml.OTALink;
+import com.fusionjack.slimota.xml.OTAParser;
 import com.fusionjack.slimota.utils.OTAUtils;
 
 import org.json.JSONArray;
@@ -27,7 +27,7 @@ public class LinkConfig {
     private static final String FILENAME = "links_conf";
 
     private static LinkConfig mInstance;
-    private static List<OTALink> mLinks;
+    private List<OTALink> mLinks;
 
     private LinkConfig() {
     }
@@ -102,8 +102,8 @@ public class LinkConfig {
         return mLinks;
     }
 
-    public static OTALink findLink(String linkId, Context context) {
-        List<OTALink> links = LinkConfig.getInstance().getLinks(context, false);
+    public OTALink findLink(String linkId, Context context) {
+        List<OTALink> links = getLinks(context, false);
         for (OTALink link : links) {
             if (link.getId().equalsIgnoreCase(linkId)) {
                 return link;

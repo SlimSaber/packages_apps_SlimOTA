@@ -1,4 +1,4 @@
-package com.fusionjack.slimota.core;
+package com.fusionjack.slimota.configs;
 
 import android.app.AlarmManager;
 import android.content.Context;
@@ -8,6 +8,7 @@ import android.widget.Toast;
 
 import com.commonsware.cwac.wakeful.WakefulIntentService;
 import com.fusionjack.slimota.R;
+import com.fusionjack.slimota.scheduler.OTAListener;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -15,13 +16,13 @@ import java.util.Date;
 /**
  * Created by fusionjack on 01.05.15.
  */
-public final class OTASettings {
+public final class AppConfig {
 
     private static final String LAST_CHECK = "last_check";
     private static final String UPDATE_INTERVAL = "update_interval";
     private static final String LATEST_VERSION = "latest_version";
 
-    private OTASettings() {
+    private AppConfig() {
     }
 
     public static String getLatestRomNameKey() {

@@ -1,4 +1,4 @@
-package com.fusionjack.slimota.parser;
+package com.fusionjack.slimota.xml;
 
 /**
  * Created by fusionjack on 09.05.15.

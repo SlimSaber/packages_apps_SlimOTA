@@ -1,4 +1,4 @@
-package com.fusionjack.slimota.parser;
+package com.fusionjack.slimota.xml;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.fusionjack.slimota.core;
+package com.fusionjack.slimota.scheduler;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -9,6 +9,7 @@ import android.net.NetworkInfo;
 import android.os.SystemClock;
 
 import com.commonsware.cwac.wakeful.WakefulIntentService;
+import com.fusionjack.slimota.configs.AppConfig;
 import com.fusionjack.slimota.utils.OTAUtils;
 
 /**
@@ -22,7 +23,7 @@ public class OTAListener implements WakefulIntentService.AlarmListener {
 
     @Override
     public void scheduleAlarms(AlarmManager alarmManager, PendingIntent pendingIntent, Context context) {
-        mIntervalValue = OTASettings.getUpdateIntervalTime(context);
+        mIntervalValue = AppConfig.getUpdateIntervalTime(context);
         if (mIntervalValue > 0) {
             OTAUtils.logInfo("SlimOTA is scheduled for every: " + mIntervalValue + " ms");
             alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,

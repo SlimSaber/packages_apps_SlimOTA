@@ -1,4 +1,4 @@
-package com.fusionjack.slimota.core;
+package com.fusionjack.slimota.tasks;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -14,9 +14,12 @@ import android.os.Message;
 
 import com.fusionjack.slimota.MainActivity;
 import com.fusionjack.slimota.R;
-import com.fusionjack.slimota.dialog.OTADialogHandler;
-import com.fusionjack.slimota.parser.OTADevice;
-import com.fusionjack.slimota.parser.OTAParser;
+import com.fusionjack.slimota.dialogs.WaitDialogHandler;
+import com.fusionjack.slimota.xml.OTADevice;
+import com.fusionjack.slimota.xml.OTAParser;
+import com.fusionjack.slimota.configs.LinkConfig;
+import com.fusionjack.slimota.configs.OTAConfig;
+import com.fusionjack.slimota.configs.AppConfig;
 import com.fusionjack.slimota.utils.OTAUtils;
 
 import org.xmlpull.v1.XmlPullParserException;
@@ -27,22 +30,22 @@ import java.io.InputStream;
 /**
  * Created by fusionjack on 29.04.15.
  */
-public class OTACheckerTask extends AsyncTask<Context, Void, OTADevice> {
+public class CheckUpdateTask extends AsyncTask<Context, Void, OTADevice> {
 
-    private static OTACheckerTask mAsyncTaskInstance = null;
-    private final Handler mHandler = new OTADialogHandler();
+    private static CheckUpdateTask mInstance = null;
+    private final Handler mHandler = new WaitDialogHandler();
     private Context mContext;
     private boolean mIsBackgroundThread;
 
-    private OTACheckerTask(boolean isBackgroundThread) {
+    private CheckUpdateTask(boolean isBackgroundThread) {
         this.mIsBackgroundThread = isBackgroundThread;
     }
 
-    public static OTACheckerTask getInstance(boolean isBackgroundThread) {
-        if (mAsyncTaskInstance == null) {
-            mAsyncTaskInstance = new OTACheckerTask(isBackgroundThread);
+    public static CheckUpdateTask getInstance(boolean isBackgroundThread) {
+        if (mInstance == null) {
+            mInstance = new CheckUpdateTask(isBackgroundThread);
         }
-        return mAsyncTaskInstance;
+        return mInstance;
     }
 
     @Override
@@ -53,17 +56,17 @@ public class OTACheckerTask extends AsyncTask<Context, Void, OTADevice> {
             return null;
         }
 
-        showProgressDialog();
+        showWaitDialog();
 
         OTADevice device = null;
-        String deviceName = OTAUtils.getDeviceName(mContext);
+        String deviceName = OTAConfig.getInstance(mContext).getDeviceName();
         OTAUtils.logInfo("deviceName: " + deviceName);
         if (!deviceName.isEmpty()) {
             try {
-                String otaUrl = OTAConfig.getInstance(mContext).getProperty(OTAConfig.OTA_URL);
+                String otaUrl = OTAConfig.getInstance(mContext).getOtaUrl();
                 InputStream is = OTAUtils.downloadURL(otaUrl);
                 if (is != null) {
-                    final String releaseType = OTAUtils.getReleaseType(mContext);
+                    final String releaseType = OTAConfig.getInstance(mContext).getReleaseType();
                     device = OTAParser.getInstance().parse(is, deviceName, releaseType);
                     is.close();
                 }
@@ -85,32 +88,32 @@ public class OTACheckerTask extends AsyncTask<Context, Void, OTADevice> {
             showNotification(mContext);
         }
 
-        OTASettings.persistLastCheck(mContext);
-        OTASettings.persistLatestVersion(latestVersion, mContext);
+        AppConfig.persistLastCheck(mContext);
+        AppConfig.persistLatestVersion(latestVersion, mContext);
         LinkConfig.persistLinks(device.getLinks(), mContext);
 
-        hideProgressDialog();
+        hideWaitDialog();
 
-        mAsyncTaskInstance = null;
+        mInstance = null;
     }
 
     @Override
     protected void onCancelled() {
         super.onCancelled();
-        mAsyncTaskInstance = null;
+        mInstance = null;
     }
 
-    private void showProgressDialog() {
+    private void showWaitDialog() {
         if (!mIsBackgroundThread) {
-            Message msg = mHandler.obtainMessage(OTADialogHandler.MSG_SHOW_DIALOG);
+            Message msg = mHandler.obtainMessage(WaitDialogHandler.MSG_SHOW_DIALOG);
             msg.obj = mContext;
             mHandler.sendMessage(msg);
         }
     }
 
-    private void hideProgressDialog() {
+    private void hideWaitDialog() {
         if (!mIsBackgroundThread) {
-            Message msg = mHandler.obtainMessage(OTADialogHandler.MSG_CLOSE_DIALOG);
+            Message msg = mHandler.obtainMessage(WaitDialogHandler.MSG_CLOSE_DIALOG);
             mHandler.sendMessage(msg);
         }
     }

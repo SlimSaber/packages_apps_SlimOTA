@@ -5,13 +5,13 @@ import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.view.MenuItem;
 
-import com.fusionjack.slimota.core.LinkConfig;
-import com.fusionjack.slimota.dialog.OTADialogFragment;
+import com.fusionjack.slimota.configs.LinkConfig;
+import com.fusionjack.slimota.dialogs.WaitDialogFragment;
 import com.fusionjack.slimota.fragments.SlimOTAFragment;
 
 
 public class MainActivity extends PreferenceActivity implements
-        OTADialogFragment.OTADialogListener, LinkConfig.LinkConfigListener {
+        WaitDialogFragment.OTADialogListener, LinkConfig.LinkConfigListener {
 
     private static final String FRAGMENT_TAG = SlimOTAFragment.class.getName();
     private SlimOTAFragment mFragment;
@@ -44,8 +44,8 @@ public class MainActivity extends PreferenceActivity implements
     @Override
     public void onProgressCancelled() {
         Fragment fragment = getFragmentManager().findFragmentByTag(FRAGMENT_TAG);
-        if (fragment instanceof OTADialogFragment.OTADialogListener) {
-            ((OTADialogFragment.OTADialogListener) fragment).onProgressCancelled();
+        if (fragment instanceof WaitDialogFragment.OTADialogListener) {
+            ((WaitDialogFragment.OTADialogListener) fragment).onProgressCancelled();
         }
     }
 

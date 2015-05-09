@@ -1,4 +1,4 @@
-package com.fusionjack.slimota.dialog;
+package com.fusionjack.slimota.dialogs;
 
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -11,10 +11,10 @@ import com.fusionjack.slimota.R;
 /**
  * Created by fusionjack on 05.05.15.
  */
-public class OTADialogFragment extends DialogFragment {
+public class WaitDialogFragment extends DialogFragment {
 
-    public static OTADialogFragment newInstance() {
-        return new OTADialogFragment();
+    public static WaitDialogFragment newInstance() {
+        return new WaitDialogFragment();
     }
 
     @Override
@@ -46,8 +46,8 @@ public class OTADialogFragment extends DialogFragment {
     @Override
     public void onCancel(DialogInterface dialog) {
         super.onCancel(dialog);
-        if (getOTAProgressDialogListener() != null) {
-            getOTAProgressDialogListener().onProgressCancelled();
+        if (getOTADialogListener() != null) {
+            getOTADialogListener().onProgressCancelled();
         }
     }
 
@@ -55,7 +55,7 @@ public class OTADialogFragment extends DialogFragment {
         void onProgressCancelled();
     }
 
-    private OTADialogListener getOTAProgressDialogListener() {
+    private OTADialogListener getOTADialogListener() {
         if (getActivity() instanceof OTADialogListener) {
             return (OTADialogListener) getActivity();
         }

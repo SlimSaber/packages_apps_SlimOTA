@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 
-import com.fusionjack.slimota.core.OTAConfig;
+import com.fusionjack.slimota.configs.OTAConfig;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -25,9 +25,6 @@ public final class OTAUtils {
     private static final String TAG = "SlimOTA";
     private static final boolean DEBUG = true;
 
-    private static String mCurrentVersion = "";
-    private static String mDeviceName = "";
-
     private OTAUtils() {
     }
 
@@ -43,35 +40,12 @@ public final class OTAUtils {
         }
     }
 
-    public static String getReleaseType(Context context) {
-        if (context != null) {
-            return OTAConfig.getInstance(context).getProperty(OTAConfig.RELEASE_TYPE);
-        }
-        return "";
-    }
-
-    public static String getCurrentVersion(Context context) {
-        if (context != null && mCurrentVersion.isEmpty()) {
-            String propName = OTAConfig.getInstance(context).getProperty(OTAConfig.VERSION_NAME);
-            mCurrentVersion = getProperty(propName);
-        }
-        return mCurrentVersion;
-    }
-
-    public static String getDeviceName(Context context) {
-        if (context != null && mDeviceName.isEmpty()) {
-            String propName = OTAConfig.getInstance(context).getProperty(OTAConfig.DEVICE_NAME);
-            mDeviceName = getProperty(propName);
-        }
-        return mDeviceName;
-    }
-
     public static boolean checkServerVersion(String serverVersion, Context context) {
         if (context == null) {
             return false;
         }
 
-        String localVersion = getCurrentVersion(context);
+        String localVersion = OTAConfig.getInstance(context).getCurrentVersion();
         OTAUtils.logInfo("serverVersion: " + serverVersion);
         OTAUtils.logInfo("localVersion: " + localVersion);
         if (serverVersion.isEmpty() || localVersion.isEmpty()) {
@@ -82,10 +56,9 @@ public final class OTAUtils {
     }
 
     public static boolean compareVersion(String localVersion, String serverVersion, Context context) {
-        OTAVersion version = new OTAVersion(context);
-        final String delimiter = version.getDelimiter();
-        final int position = version.getPosition();
-        final SimpleDateFormat format = version.getFormat();
+        final String delimiter = OTAConfig.getInstance(context).getDelimiter();
+        final int position = OTAConfig.getInstance(context).getPosition();
+        final SimpleDateFormat format = OTAConfig.getInstance(context).getFormat();
 
         String[] localTokens = localVersion.split(delimiter);
         String[] serverTokens = serverVersion.split(delimiter);

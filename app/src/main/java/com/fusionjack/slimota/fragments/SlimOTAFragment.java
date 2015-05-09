@@ -10,11 +10,12 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 
 import com.fusionjack.slimota.R;
-import com.fusionjack.slimota.core.LinkConfig;
-import com.fusionjack.slimota.core.OTACheckerTask;
-import com.fusionjack.slimota.core.OTASettings;
-import com.fusionjack.slimota.dialog.OTADialogFragment;
-import com.fusionjack.slimota.parser.OTALink;
+import com.fusionjack.slimota.configs.LinkConfig;
+import com.fusionjack.slimota.configs.OTAConfig;
+import com.fusionjack.slimota.tasks.CheckUpdateTask;
+import com.fusionjack.slimota.configs.AppConfig;
+import com.fusionjack.slimota.dialogs.WaitDialogFragment;
+import com.fusionjack.slimota.xml.OTALink;
 import com.fusionjack.slimota.utils.OTAUtils;
 
 import java.util.List;
@@ -25,7 +26,7 @@ import java.util.List;
 public class SlimOTAFragment extends PreferenceFragment implements
         Preference.OnPreferenceChangeListener,
         SharedPreferences.OnSharedPreferenceChangeListener ,
-        OTADialogFragment.OTADialogListener,
+        WaitDialogFragment.OTADialogListener,
         LinkConfig.LinkConfigListener {
 
     private static final String KEY_ROM_INFO = "key_rom_info";
@@ -38,7 +39,7 @@ public class SlimOTAFragment extends PreferenceFragment implements
     private ListPreference mUpdateInterval;
     private PreferenceCategory mLinksCategory;
 
-    private OTACheckerTask mTask;
+    private CheckUpdateTask mTask;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -87,11 +88,11 @@ public class SlimOTAFragment extends PreferenceFragment implements
 
     private void updateRomInfo() {
         if (mRomInfo != null) {
-            final String currentVersion = OTAUtils.getCurrentVersion(getActivity());
+            final String currentVersion = OTAConfig.getInstance(getActivity()).getCurrentVersion();
             mRomInfo.setTitle(currentVersion);
 
             String prefix = getActivity().getResources().getString(R.string.latest_version);
-            String latestVersion = OTASettings.getLatestVersion(getActivity());
+            String latestVersion = AppConfig.getLatestVersion(getActivity());
             if (latestVersion.isEmpty()) {
                 latestVersion = getActivity().getResources().getString(R.string.unknown);
                 mRomInfo.setSummary(String.format(prefix, latestVersion));
@@ -105,13 +106,13 @@ public class SlimOTAFragment extends PreferenceFragment implements
 
     private void updateLastCheckSummary() {
         if (mCheckUpdate != null) {
-            mCheckUpdate.setSummary(OTASettings.getLastCheck(getActivity()));
+            mCheckUpdate.setSummary(AppConfig.getLastCheck(getActivity()));
         }
     }
 
     private void updateIntervalSummary() {
         if (mUpdateInterval != null) {
-            mUpdateInterval.setValueIndex(OTASettings.getUpdateIntervalIndex(getActivity()));
+            mUpdateInterval.setValueIndex(AppConfig.getUpdateIntervalIndex(getActivity()));
             mUpdateInterval.setSummary(mUpdateInterval.getEntry());
         }
     }
@@ -147,13 +148,13 @@ public class SlimOTAFragment extends PreferenceFragment implements
         final String key = preference.getKey();
         switch (key) {
             case KEY_CHECK_UPDATE:
-                mTask = OTACheckerTask.getInstance(false);
+                mTask = CheckUpdateTask.getInstance(false);
                 if (!mTask.getStatus().equals(AsyncTask.Status.RUNNING)) {
                     mTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, getActivity());
                 }
                 return true;
             default:
-                OTALink link = LinkConfig.findLink(key,getActivity());
+                OTALink link = LinkConfig.getInstance().findLink(key, getActivity());
                 if (link != null) {
                     OTAUtils.launchUrl(link.getUrl(), getActivity());
                 }
@@ -165,7 +166,7 @@ public class SlimOTAFragment extends PreferenceFragment implements
     @Override
     public boolean onPreferenceChange(Preference preference, Object value) {
         if (preference == mUpdateInterval) {
-            OTASettings.persistUpdateIntervalIndex(Integer.valueOf((String) value), getActivity());
+            AppConfig.persistUpdateIntervalIndex(Integer.valueOf((String) value), getActivity());
             return true;
         }
         return false;
@@ -173,13 +174,13 @@ public class SlimOTAFragment extends PreferenceFragment implements
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals(OTASettings.getLatestRomNameKey())) {
+        if (key.equals(AppConfig.getLatestRomNameKey())) {
             updateRomInfo();
         }
-        if (key.equals(OTASettings.getLastCheckKey())) {
+        if (key.equals(AppConfig.getLastCheckKey())) {
             updateLastCheckSummary();
         }
-        if (key.equals(OTASettings.getUpdateIntervalKey())) {
+        if (key.equals(AppConfig.getUpdateIntervalKey())) {
             updateIntervalSummary();
         }
     }
