@@ -6,7 +6,6 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.fusionjack.slimota.core.OTAConfig;
-import com.fusionjack.slimota.parser.OTADevice;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -67,34 +66,33 @@ public final class OTAUtils {
         return mDeviceName;
     }
 
-    public static boolean checkVersion(OTADevice device, Context context) {
-        if (device == null || context == null) {
+    public static boolean checkServerVersion(String serverVersion, Context context) {
+        if (context == null) {
             return false;
         }
 
-        String serverBuildname = device.getLatestVersion();
-        String localBuildname = getCurrentVersion(context);
-        OTAUtils.logInfo("serverBuildname: " + serverBuildname);
-        OTAUtils.logInfo("localBuildname: " + localBuildname);
-        if (serverBuildname.isEmpty() || localBuildname.isEmpty()) {
+        String localVersion = getCurrentVersion(context);
+        OTAUtils.logInfo("serverVersion: " + serverVersion);
+        OTAUtils.logInfo("localVersion: " + localVersion);
+        if (serverVersion.isEmpty() || localVersion.isEmpty()) {
             return false;
         }
 
-        return checkVersion(localBuildname, serverBuildname, context);
+        return compareVersion(localVersion, serverVersion, context);
     }
 
-    public static boolean checkVersion(String localBuildname, String serverBuildname, Context context) {
+    public static boolean compareVersion(String localVersion, String serverVersion, Context context) {
         OTAVersion version = new OTAVersion(context);
         final String delimiter = version.getDelimiter();
         final int position = version.getPosition();
         final SimpleDateFormat format = version.getFormat();
 
-        String[] localTokens = localBuildname.split(delimiter);
-        String[] serverTokens = serverBuildname.split(delimiter);
+        String[] localTokens = localVersion.split(delimiter);
+        String[] serverTokens = serverVersion.split(delimiter);
         if (position > -1 && position < localTokens.length && position < serverTokens.length) {
-            String currentVersion = localTokens[position];
-            String serverVersion = serverTokens[position];
-            return isVersionNewer(serverVersion, currentVersion, format);
+            String localDate = localTokens[position];
+            String serverDate = serverTokens[position];
+            return isVersionNewer(serverDate, localDate, format);
         }
         return false;
     }

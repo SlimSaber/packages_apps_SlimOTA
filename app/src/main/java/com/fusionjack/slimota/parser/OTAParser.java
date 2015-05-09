@@ -17,6 +17,11 @@ public class OTAParser {
     private static final String FILENAME_TAG = "Filename";
     private static final String URL_TAG = "Url";
 
+    public static final String ID = "id";
+    public static final String TITLE = "title";
+    public static final String DESCRIPTION = "description";
+    public static final String URL = "url";
+
     private String mDeviceName = null;
     private String mReleaseType = null;
     private OTADevice mDevice = null;
@@ -47,18 +52,6 @@ public class OTAParser {
         } finally {
             in.close();
         }
-    }
-
-    public static boolean isUrlKey(String key) {
-        return key.toLowerCase().endsWith(URL_TAG.toLowerCase());
-    }
-
-    public static String stripUrlfromKey(String key) {
-        int index = key.toLowerCase().indexOf(URL_TAG.toLowerCase());
-        if (index > 0) {
-            return key.substring(0, index);
-        }
-        return key;
     }
 
     private void readBuildType(XmlPullParser parser) throws XmlPullParserException, IOException {
@@ -97,15 +90,35 @@ public class OTAParser {
                 continue;
             }
             String tagName = parser.getName();
-            String tagValue = readTag(parser, tagName);
             if (tagName.equalsIgnoreCase(FILENAME_TAG)) {
+                String tagValue = readTag(parser, tagName);
                 mDevice.setLatestVersion(tagValue);
-            } else if (isUrlKey(tagName)) {
-                mDevice.addUrl(tagName, tagValue);
+            } else if (isUrlTag(tagName)) {
+                OTALink link = readLink(parser, tagName);
+                mDevice.addLink(link);
             } else {
                 skip(parser);
             }
         }
+    }
+
+    private OTALink readLink(XmlPullParser parser, String tag) throws XmlPullParserException, IOException {
+        parser.require(XmlPullParser.START_TAG, ns, tag);
+
+        String id = parser.getAttributeValue(null, ID);
+        if (id == null || id.isEmpty()) {
+            id = tag;
+        }
+        OTALink link = new OTALink(id);
+        String title = parser.getAttributeValue(null, TITLE);
+        link.setTitle(title);
+        String description = parser.getAttributeValue(null, DESCRIPTION);
+        link.setDescription(description);
+        String url = readText(parser);
+        link.setUrl(url);
+
+        parser.require(XmlPullParser.END_TAG, ns, tag);
+        return link;
     }
 
     private String readTag(XmlPullParser parser, String tag) throws IOException, XmlPullParserException {
@@ -139,5 +152,9 @@ public class OTAParser {
                     break;
             }
         }
+    }
+
+    private static boolean isUrlTag(String tagName) {
+        return tagName.toLowerCase().endsWith(URL_TAG.toLowerCase());
     }
 }

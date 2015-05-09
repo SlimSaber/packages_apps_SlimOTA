@@ -8,13 +8,9 @@ import android.widget.Toast;
 
 import com.commonsware.cwac.wakeful.WakefulIntentService;
 import com.fusionjack.slimota.R;
-import com.fusionjack.slimota.parser.OTADevice;
-import com.fusionjack.slimota.parser.OTAParser;
 
 import java.text.DateFormat;
 import java.util.Date;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by fusionjack on 01.05.15.
@@ -60,39 +56,9 @@ public final class OTASettings {
         return sharedPreferences.getString(LATEST_VERSION, "");
     }
 
-    public static String getUrl(String key, Context context) {
+    public static void persistLatestVersion(String latestVersion, Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        return sharedPreferences.getString(key, "");
-    }
-
-    public static OTADevice getUrls(Context context) {
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        Map<String, ?> prefs = sharedPreferences.getAll();
-        OTADevice device = new OTADevice();
-        for (String key : prefs.keySet()) {
-            if (OTAParser.isUrlKey(key)) {
-                final String url = sharedPreferences.getString(key, "");
-                device.addUrl(key, url);
-            }
-        }
-        return device;
-    }
-
-    public static void persistUrls(OTADevice device, Context context) {
-        if (device != null) {
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-            Set<String> keys = device.getUrls();
-            for (String key : keys) {
-                sharedPreferences.edit().putString(key, device.getUrl(key)).apply();
-            }
-        }
-    }
-
-    public static void persistLatestVersion(OTADevice device, Context context) {
-        if (device != null) {
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-            sharedPreferences.edit().putString(LATEST_VERSION, device.getLatestVersion()).apply();
-        }
+        sharedPreferences.edit().putString(LATEST_VERSION, latestVersion).apply();
     }
 
     public static void persistLastCheck(Context context) {

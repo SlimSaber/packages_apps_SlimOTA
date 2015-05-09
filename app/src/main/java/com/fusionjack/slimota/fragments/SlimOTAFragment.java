@@ -10,12 +10,14 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 
 import com.fusionjack.slimota.R;
+import com.fusionjack.slimota.core.LinkConfig;
 import com.fusionjack.slimota.core.OTACheckerTask;
 import com.fusionjack.slimota.core.OTASettings;
 import com.fusionjack.slimota.dialog.OTADialogFragment;
-import com.fusionjack.slimota.parser.OTADevice;
-import com.fusionjack.slimota.parser.OTAParser;
+import com.fusionjack.slimota.parser.OTALink;
 import com.fusionjack.slimota.utils.OTAUtils;
+
+import java.util.List;
 
 /**
  * Created by fusionjack on 30.04.15.
@@ -23,7 +25,8 @@ import com.fusionjack.slimota.utils.OTAUtils;
 public class SlimOTAFragment extends PreferenceFragment implements
         Preference.OnPreferenceChangeListener,
         SharedPreferences.OnSharedPreferenceChangeListener ,
-        OTADialogFragment.OTADialogListener {
+        OTADialogFragment.OTADialogListener,
+        LinkConfig.LinkConfigListener {
 
     private static final String KEY_ROM_INFO = "key_rom_info";
     private static final String KEY_CHECK_UPDATE = "key_check_update";
@@ -53,17 +56,6 @@ public class SlimOTAFragment extends PreferenceFragment implements
         }
 
         mLinksCategory = (PreferenceCategory) getPreferenceScreen().findPreference(CATEGORY_LINKS);
-        if (mLinksCategory != null) {
-            OTADevice device = OTASettings.getUrls(getActivity());
-            for (String key : device.getUrls()) {
-                PreferenceScreen urlPref = (PreferenceScreen) getPreferenceScreen().findPreference(key);
-                if (urlPref == null) {
-                    urlPref = getPreferenceManager().createPreferenceScreen(getActivity());
-                    urlPref.setKey(key);
-                    mLinksCategory.addPreference(urlPref);
-                }
-            }
-        }
 
         updatePreferences();
     }
@@ -72,22 +64,23 @@ public class SlimOTAFragment extends PreferenceFragment implements
         updateRomInfo();
         updateLastCheckSummary();
         updateIntervalSummary();
-        updateUrls();
+        updateLinks(false);
     }
 
-    private void updateUrls() {
-        OTADevice device = OTASettings.getUrls(getActivity());
-        for (String key : device.getUrls()) {
-            PreferenceScreen urlPref = (PreferenceScreen) getPreferenceScreen().findPreference(key);
-            if (urlPref == null && mLinksCategory != null) {
-                urlPref = getPreferenceManager().createPreferenceScreen(getActivity());
-                urlPref.setKey(key);
-                mLinksCategory.addPreference(urlPref);
+    private void updateLinks(boolean force) {
+        List<OTALink> links = LinkConfig.getInstance().getLinks(getActivity(), force);
+        for (OTALink link : links) {
+            String id = link.getId();
+            PreferenceScreen linkPref = (PreferenceScreen) getPreferenceScreen().findPreference(id);
+            if (linkPref == null && mLinksCategory != null) {
+                linkPref = getPreferenceManager().createPreferenceScreen(getActivity());
+                linkPref.setKey(id);
+                mLinksCategory.addPreference(linkPref);
             }
-            if (urlPref != null) {
-                urlPref.setTitle(OTAParser.stripUrlfromKey(key));
-                String url = device.getUrl(key);
-                urlPref.setSummary(url.isEmpty() ? "" : url);
+            if (linkPref != null) {
+                String title = link.getTitle();
+                linkPref.setTitle(title.isEmpty() ? id : title);
+                linkPref.setSummary(link.getDescription());
             }
         }
     }
@@ -102,7 +95,7 @@ public class SlimOTAFragment extends PreferenceFragment implements
             if (latestVersion.isEmpty()) {
                 latestVersion = getActivity().getResources().getString(R.string.unknown);
                 mRomInfo.setSummary(String.format(prefix, latestVersion));
-            } else if (!OTAUtils.checkVersion(currentVersion, latestVersion, getActivity())) {
+            } else if (!OTAUtils.compareVersion(currentVersion, latestVersion, getActivity())) {
                 mRomInfo.setSummary(getActivity().getResources().getString(R.string.system_uptodate));
             } else {
                 mRomInfo.setSummary(String.format(prefix, latestVersion));
@@ -145,6 +138,11 @@ public class SlimOTAFragment extends PreferenceFragment implements
     }
 
     @Override
+    public void onConfigChange() {
+        updateLinks(true);
+    }
+
+    @Override
     public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
         final String key = preference.getKey();
         switch (key) {
@@ -155,8 +153,9 @@ public class SlimOTAFragment extends PreferenceFragment implements
                 }
                 return true;
             default:
-                if (OTAParser.isUrlKey(key)) {
-                    OTAUtils.launchUrl(OTASettings.getUrl(key, getActivity()), getActivity());
+                OTALink link = LinkConfig.findLink(key,getActivity());
+                if (link != null) {
+                    OTAUtils.launchUrl(link.getUrl(), getActivity());
                 }
                 break;
         }
@@ -182,9 +181,6 @@ public class SlimOTAFragment extends PreferenceFragment implements
         }
         if (key.equals(OTASettings.getUpdateIntervalKey())) {
             updateIntervalSummary();
-        }
-        if (OTAParser.isUrlKey(key)) {
-            updateUrls();
         }
     }
 }
