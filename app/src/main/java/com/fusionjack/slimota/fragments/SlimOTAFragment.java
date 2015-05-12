@@ -26,13 +26,13 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceScreen;
 
 import com.fusionjack.slimota.R;
-import com.fusionjack.slimota.configs.LinkConfig;
-import com.fusionjack.slimota.configs.OTAConfig;
-import com.fusionjack.slimota.tasks.CheckUpdateTask;
 import com.fusionjack.slimota.configs.AppConfig;
+import com.fusionjack.slimota.configs.LinkConfig;
+import com.fusionjack.slimota.configs.OTAVersion;
 import com.fusionjack.slimota.dialogs.WaitDialogFragment;
-import com.fusionjack.slimota.xml.OTALink;
+import com.fusionjack.slimota.tasks.CheckUpdateTask;
 import com.fusionjack.slimota.utils.OTAUtils;
+import com.fusionjack.slimota.xml.OTALink;
 
 import java.util.List;
 
@@ -70,8 +70,6 @@ public class SlimOTAFragment extends PreferenceFragment implements
         }
 
         mLinksCategory = (PreferenceCategory) getPreferenceScreen().findPreference(CATEGORY_LINKS);
-
-        updatePreferences();
     }
 
     private void updatePreferences() {
@@ -101,18 +99,20 @@ public class SlimOTAFragment extends PreferenceFragment implements
 
     private void updateRomInfo() {
         if (mRomInfo != null) {
-            final String currentVersion = OTAConfig.getInstance(getActivity()).getCurrentVersion();
-            mRomInfo.setTitle(currentVersion);
+            String fullLocalVersion = OTAVersion.getFullLocalVersion(getActivity());
+            String shortLocalVersion = OTAVersion.extractVersionFrom(fullLocalVersion, getActivity());
+            mRomInfo.setTitle(fullLocalVersion);
 
             String prefix = getActivity().getResources().getString(R.string.latest_version);
-            String latestVersion = AppConfig.getLatestVersion(getActivity());
-            if (latestVersion.isEmpty()) {
-                latestVersion = getActivity().getResources().getString(R.string.unknown);
-                mRomInfo.setSummary(String.format(prefix, latestVersion));
-            } else if (!OTAUtils.compareVersion(currentVersion, latestVersion, getActivity())) {
+            String fullLatestVersion = AppConfig.getFullLatestVersion(getActivity());
+            String shortLatestVersion = OTAVersion.extractVersionFrom(fullLatestVersion, getActivity());
+            if (fullLatestVersion.isEmpty()) {
+                fullLatestVersion = getActivity().getResources().getString(R.string.unknown);
+                mRomInfo.setSummary(String.format(prefix, fullLatestVersion));
+            } else if (!OTAVersion.compareVersion(shortLatestVersion, shortLocalVersion, getActivity())) {
                 mRomInfo.setSummary(getActivity().getResources().getString(R.string.system_uptodate));
             } else {
-                mRomInfo.setSummary(String.format(prefix, latestVersion));
+                mRomInfo.setSummary(String.format(prefix, fullLatestVersion));
             }
         }
     }
@@ -187,7 +187,7 @@ public class SlimOTAFragment extends PreferenceFragment implements
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals(AppConfig.getLatestRomNameKey())) {
+        if (key.equals(AppConfig.getLatestVersionKey())) {
             updateRomInfo();
         }
         if (key.equals(AppConfig.getLastCheckKey())) {

@@ -35,13 +35,10 @@ public class OTAConfig extends Properties {
 
     private final static String DEVICE_NAME = "device_name";
 
-    private final static String VERSION_NAME = "version_name";
+    private final static String VERSION_SOURCE = "version_source";
     private final static String VERSION_DELIMITER = "version_delimiter";
     private final static String VERSION_FORMAT = "version_format";
     private final static String VERSION_POSITION = "version_position";
-
-    private static String mCurrentVersion = "";
-    private static String mDeviceName = "";
 
     private static OTAConfig mInstance;
 
@@ -63,31 +60,23 @@ public class OTAConfig extends Properties {
     }
 
     public String getOtaUrl() {
-        return getProperty(OTAConfig.OTA_URL);
+        return getProperty(OTAConfig.OTA_URL, "");
     }
 
     public String getReleaseType() {
-        return getProperty(OTAConfig.RELEASE_TYPE);
+        return getProperty(OTAConfig.RELEASE_TYPE, "Stable");
     }
 
-    public String getCurrentVersion() {
-        if (mCurrentVersion.isEmpty()) {
-            String propName = getProperty(VERSION_NAME);
-            mCurrentVersion = OTAUtils.getProperty(propName);
-        }
-        return mCurrentVersion;
+    public String getVersionSource() {
+        return getProperty(VERSION_SOURCE, "");
     }
 
-    public String getDeviceName() {
-        if (mDeviceName.isEmpty()) {
-            String propName = getProperty(OTAConfig.DEVICE_NAME);
-            mDeviceName = OTAUtils.getProperty(propName);
-        }
-        return mDeviceName;
+    public String getDeviceSource() {
+        return getProperty(OTAConfig.DEVICE_NAME, "");
     }
 
     public String getDelimiter() {
-        return getProperty(OTAConfig.VERSION_DELIMITER);
+        return getProperty(OTAConfig.VERSION_DELIMITER, "");
     }
 
     public int getPosition() {
@@ -101,7 +90,16 @@ public class OTAConfig extends Properties {
     }
 
     public SimpleDateFormat getFormat() {
-        String format = getProperty(OTAConfig.VERSION_FORMAT);
-        return new SimpleDateFormat(format, Locale.US);
+        String format = getProperty(OTAConfig.VERSION_FORMAT, "");
+        if (format.isEmpty()) {
+            return null;
+        }
+
+        try {
+            return new SimpleDateFormat(format, Locale.US);
+        } catch (IllegalArgumentException | NullPointerException e) {
+            OTAUtils.logError(e);
+        }
+        return null;
     }
 }

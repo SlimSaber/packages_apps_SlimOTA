@@ -24,19 +24,21 @@ import android.util.Log;
 import com.fusionjack.slimota.configs.OTAConfig;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.Properties;
 
 public final class OTAUtils {
 
     private static final String TAG = "SlimOTA";
     private static final boolean DEBUG = true;
+
+    private static final String BUILD_PROP = "/system/build.prop";
 
     private OTAUtils() {
     }
@@ -53,72 +55,38 @@ public final class OTAUtils {
         }
     }
 
-    public static boolean checkServerVersion(String serverVersion, Context context) {
-        if (context == null) {
-            return false;
-        }
-
-        String localVersion = OTAConfig.getInstance(context).getCurrentVersion();
-        OTAUtils.logInfo("serverVersion: " + serverVersion);
-        OTAUtils.logInfo("localVersion: " + localVersion);
-        if (serverVersion.isEmpty() || localVersion.isEmpty()) {
-            return false;
-        }
-
-        return compareVersion(localVersion, serverVersion, context);
+    public static String getDeviceName(Context context) {
+        String propName = OTAConfig.getInstance(context).getDeviceSource();
+        return OTAUtils.getBuildProp(propName);
     }
 
-    public static boolean compareVersion(String localVersion, String serverVersion, Context context) {
-        final String delimiter = OTAConfig.getInstance(context).getDelimiter();
-        final int position = OTAConfig.getInstance(context).getPosition();
-        final SimpleDateFormat format = OTAConfig.getInstance(context).getFormat();
-
-        String[] localTokens = localVersion.split(delimiter);
-        String[] serverTokens = serverVersion.split(delimiter);
-        if (position > -1 && position < localTokens.length && position < serverTokens.length) {
-            String localDate = localTokens[position];
-            String serverDate = serverTokens[position];
-            return isVersionNewer(serverDate, localDate, format);
-        }
-        return false;
-    }
-
-    private static boolean isVersionNewer(String serverVersion, String currentVersion,
-                                          final SimpleDateFormat format) {
-        boolean versionIsNew = false;
-        if (format == null || serverVersion.isEmpty() || currentVersion.isEmpty()) {
-            return versionIsNew;
-        }
+    public static String getBuildProp(String propertyName) {
+        Properties buildProps = new Properties();
         try {
-            Date serverDate = format.parse(serverVersion);
-            Date currentDate = format.parse(currentVersion);
-            versionIsNew = serverDate.after(currentDate);
-        } catch (ParseException e) {
-            logError(e);
-        }
-        return versionIsNew;
-    }
-
-    public static String getProperty(String property) {
-        Process process = null;
-        BufferedReader buff = null;
-        try {
-            process = Runtime.getRuntime().exec("getprop " + property);
-            buff = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            return buff.readLine();
+            FileInputStream is = new FileInputStream(new File(BUILD_PROP));
+            buildProps.load(is);
+            is.close();
+            return buildProps.getProperty(propertyName, "");
         } catch (IOException e) {
             logError(e);
-        } finally {
-            if (process != null) {
-                process.destroy();
+        }
+        return "";
+    }
+
+    public static String runCommand(String command) {
+        try {
+            StringBuffer output = new StringBuffer();
+            Process p = Runtime.getRuntime().exec(command);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            String line = "";
+            while ((line = reader.readLine()) != null) {
+                output.append(line + "\n");
             }
-            try {
-                if (buff != null) {
-                    buff.close();
-                }
-            } catch (IOException e) {
-                logError(e);
-            }
+            reader.close();
+            p.waitFor();
+            return output.toString();
+        } catch (InterruptedException | IOException e) {
+            logError(e);
         }
         return "";
     }

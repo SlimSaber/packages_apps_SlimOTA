@@ -38,7 +38,7 @@ public final class AppConfig {
     private AppConfig() {
     }
 
-    public static String getLatestRomNameKey() {
+    public static String getLatestVersionKey() {
         return LATEST_VERSION;
     }
 
@@ -65,7 +65,7 @@ public final class AppConfig {
         return buildLastCheckSummary(time, context);
     }
 
-    public static String getLatestVersion(Context context) {
+    public static String getFullLatestVersion(Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         return sharedPreferences.getString(LATEST_VERSION, "");
     }

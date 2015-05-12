@@ -30,6 +30,7 @@ import android.os.Message;
 
 import com.fusionjack.slimota.MainActivity;
 import com.fusionjack.slimota.R;
+import com.fusionjack.slimota.configs.OTAVersion;
 import com.fusionjack.slimota.dialogs.WaitDialogHandler;
 import com.fusionjack.slimota.xml.OTADevice;
 import com.fusionjack.slimota.xml.OTAParser;
@@ -72,7 +73,7 @@ public class CheckUpdateTask extends AsyncTask<Context, Void, OTADevice> {
         showWaitDialog();
 
         OTADevice device = null;
-        String deviceName = OTAConfig.getInstance(mContext).getDeviceName();
+        String deviceName = OTAUtils.getDeviceName(mContext);
         OTAUtils.logInfo("deviceName: " + deviceName);
         if (!deviceName.isEmpty()) {
             try {
@@ -96,7 +97,7 @@ public class CheckUpdateTask extends AsyncTask<Context, Void, OTADevice> {
         super.onPostExecute(device);
 
         String latestVersion = device.getLatestVersion();
-        boolean updateAvailable = OTAUtils.checkServerVersion(latestVersion, mContext);
+        boolean updateAvailable = OTAVersion.checkServerVersion(latestVersion, mContext);
         if (updateAvailable) {
             showNotification(mContext);
         }
