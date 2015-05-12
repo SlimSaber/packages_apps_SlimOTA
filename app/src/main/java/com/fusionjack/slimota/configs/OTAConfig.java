@@ -68,7 +68,7 @@ public class OTAConfig extends Properties {
     }
 
     public String getVersionSource() {
-        return getProperty(VERSION_SOURCE, "");
+        return getProperty(VERSION_SOURCE, getProperty("version_name", ""));
     }
 
     public String getDeviceSource() {
