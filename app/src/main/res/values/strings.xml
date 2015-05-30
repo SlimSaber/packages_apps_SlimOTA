@@ -34,6 +34,8 @@
     <string name="check_update_title">Check update</string>
     <string name="last_check_summary">Last check: %1$s</string>
     <string name="last_check_never">Never</string>
+    <string name="check_update_failed">Can\'t check update</string>
+    <string name="no_update_available">No update available</string>
 
     <!-- Update interval -->
     <string name="interval_title">Automatic update interval</string>

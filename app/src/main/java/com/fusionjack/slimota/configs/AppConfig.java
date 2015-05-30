@@ -20,11 +20,11 @@ import android.app.AlarmManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.widget.Toast;
 
 import com.commonsware.cwac.wakeful.WakefulIntentService;
 import com.fusionjack.slimota.R;
 import com.fusionjack.slimota.scheduler.OTAListener;
+import com.fusionjack.slimota.utils.OTAUtils;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -105,12 +105,10 @@ public final class AppConfig {
         if (intervalValue > 0) {
             WakefulIntentService.cancelAlarms(context);
             WakefulIntentService.scheduleAlarms(new OTAListener(), context, true);
-            Toast.makeText(context, context.getResources().getString(R.string.autoupdate_enabled),
-                    Toast.LENGTH_LONG).show();
+            OTAUtils.toast(R.string.autoupdate_enabled, context);
         } else {
             WakefulIntentService.cancelAlarms(context);
-            Toast.makeText(context, context.getResources().getString(R.string.autoupdate_disabled),
-                    Toast.LENGTH_LONG).show();
+            OTAUtils.toast(R.string.autoupdate_disabled, context);
         }
     }
 
