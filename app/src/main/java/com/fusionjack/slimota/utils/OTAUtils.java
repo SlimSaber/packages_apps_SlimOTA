@@ -20,6 +20,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.fusionjack.slimota.configs.OTAConfig;
 
@@ -52,6 +53,13 @@ public final class OTAUtils {
     public static void logInfo(String message) {
         if (DEBUG) {
             Log.i(TAG, message);
+        }
+    }
+
+    public static void toast(int messageId, Context context) {
+        if (context != null) {
+            Toast.makeText(context, context.getResources().getString(messageId),
+                    Toast.LENGTH_LONG).show();
         }
     }
 

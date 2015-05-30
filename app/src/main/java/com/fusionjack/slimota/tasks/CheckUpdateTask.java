@@ -30,14 +30,14 @@ import android.os.Message;
 
 import com.fusionjack.slimota.MainActivity;
 import com.fusionjack.slimota.R;
-import com.fusionjack.slimota.configs.OTAVersion;
-import com.fusionjack.slimota.dialogs.WaitDialogHandler;
-import com.fusionjack.slimota.xml.OTADevice;
-import com.fusionjack.slimota.xml.OTAParser;
+import com.fusionjack.slimota.configs.AppConfig;
 import com.fusionjack.slimota.configs.LinkConfig;
 import com.fusionjack.slimota.configs.OTAConfig;
-import com.fusionjack.slimota.configs.AppConfig;
+import com.fusionjack.slimota.configs.OTAVersion;
+import com.fusionjack.slimota.dialogs.WaitDialogHandler;
 import com.fusionjack.slimota.utils.OTAUtils;
+import com.fusionjack.slimota.xml.OTADevice;
+import com.fusionjack.slimota.xml.OTAParser;
 
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -96,15 +96,21 @@ public class CheckUpdateTask extends AsyncTask<Context, Void, OTADevice> {
     protected void onPostExecute(OTADevice device) {
         super.onPostExecute(device);
 
-        String latestVersion = device.getLatestVersion();
-        boolean updateAvailable = OTAVersion.checkServerVersion(latestVersion, mContext);
-        if (updateAvailable) {
-            showNotification(mContext);
+        if (device == null) {
+            showToast(R.string.check_update_failed);
+        } else {
+            String latestVersion = device.getLatestVersion();
+            boolean updateAvailable = OTAVersion.checkServerVersion(latestVersion, mContext);
+            if (updateAvailable) {
+                showNotification(mContext);
+            } else {
+                showToast(R.string.no_update_available);
+            }
+            AppConfig.persistLatestVersion(latestVersion, mContext);
+            LinkConfig.persistLinks(device.getLinks(), mContext);
         }
 
         AppConfig.persistLastCheck(mContext);
-        AppConfig.persistLatestVersion(latestVersion, mContext);
-        LinkConfig.persistLinks(device.getLinks(), mContext);
 
         hideWaitDialog();
 
@@ -129,6 +135,12 @@ public class CheckUpdateTask extends AsyncTask<Context, Void, OTADevice> {
         if (!mIsBackgroundThread) {
             Message msg = mHandler.obtainMessage(WaitDialogHandler.MSG_CLOSE_DIALOG);
             mHandler.sendMessage(msg);
+        }
+    }
+
+    private void showToast(int messageId) {
+        if (!mIsBackgroundThread) {
+            OTAUtils.toast(messageId, mContext);
         }
     }
 
