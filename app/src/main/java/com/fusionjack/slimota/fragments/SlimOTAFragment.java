@@ -16,6 +16,7 @@
 
 package com.fusionjack.slimota.fragments;
 
+import android.app.FragmentTransaction;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -44,6 +45,7 @@ public class SlimOTAFragment extends PreferenceFragment implements
 
     private static final String KEY_ROM_INFO = "key_rom_info";
     private static final String KEY_CHECK_UPDATE = "key_check_update";
+    private static final String KEY_CHANGELOG = "key_changelog";
     private static final String KEY_UPDATE_INTERVAL = "key_update_interval";
     private static final String CATEGORY_LINKS = "category_links";
 
@@ -165,6 +167,14 @@ public class SlimOTAFragment extends PreferenceFragment implements
                 if (!mTask.getStatus().equals(AsyncTask.Status.RUNNING)) {
                     mTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, getActivity());
                 }
+                return true;
+            case KEY_CHANGELOG:
+                ChangelogFragment changelogFrag = new ChangelogFragment();
+                FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+                transaction.replace(this.getId(), changelogFrag);
+                transaction.addToBackStack(this.getClass().getName());
+                transaction.commit();
                 return true;
             default:
                 OTALink link = LinkConfig.getInstance().findLink(key, getActivity());

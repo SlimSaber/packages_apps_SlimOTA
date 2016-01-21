@@ -48,5 +48,8 @@
 
     <!-- Dialog -->
     <string name="dialog_message">Checking for ROM updates, please wait…</string>
+    <string name="no_changelog_summary">No changelog</string>
+    <string name="changelog_title">Changelog</string>
+    <string name="changelog_summary">Current changelog</string>
 
 </resources>

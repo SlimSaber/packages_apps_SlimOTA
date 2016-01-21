@@ -31,6 +31,12 @@
             android:title="@string/check_update_title">
         </PreferenceScreen>
 
+        <PreferenceScreen
+            android:key="key_changelog"
+            android:title="@string/changelog_title"
+            android:summary="@string/changelog_summary" >
+        </PreferenceScreen>
+
         <ListPreference
             android:key="key_update_interval"
             android:title="@string/interval_title"
